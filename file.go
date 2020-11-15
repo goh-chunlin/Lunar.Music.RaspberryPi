@@ -5,8 +5,11 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func downloadDriveItem(downloadUrl string, fileName string) error {
@@ -21,4 +24,40 @@ func downloadDriveItem(downloadUrl string, fileName string) error {
 	}
 
 	return nil
+}
+
+func isDriveItemDownloaded(driveItemId string) bool {
+	dataFile, err := os.OpenFile("playlist.dat", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		failOnError(err, "Failed to open the file playlist.dat")
+	}
+
+	defer dataFile.Close()
+
+	isMusicFileDownloaded := false
+	scanner := bufio.NewScanner(dataFile)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if !isMusicFileDownloaded && 0 == strings.Index(line, driveItemId) {
+			lineComponents := strings.Split(line, "##########")
+
+			playSingleMusicFile(lineComponents[1])
+
+			isMusicFileDownloaded = true
+		}
+	}
+
+	return isMusicFileDownloaded
+}
+
+func updateDownloadedDriveItemsList(driveItemId string, driveItemFileName string) {
+	dataFile, err := os.OpenFile("playlist.dat", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		failOnError(err, "Failed to open the file playlist.dat")
+	}
+
+	defer dataFile.Close()
+
+	dataFile.Write([]byte(fmt.Sprintf("%v##########%v\n", driveItemId, driveItemFileName)))
 }

@@ -5,12 +5,8 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
-	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/streadway/amqp"
 )
@@ -69,32 +65,13 @@ func receiveAmqp(rabbitMQServerConnectionString string, rabbitMQChannelName stri
 					driveItemDownloadUrl := task.Content[1]
 					driveItemFileName := task.Content[2]
 
-					dataFile, err := os.OpenFile("playlist.dat", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-					if err != nil {
-						failOnError(err, "Failed to open the file playlist.dat")
-					}
-
-					defer dataFile.Close()
-
-					isMusicFileDownloaded := false
-					scanner := bufio.NewScanner(dataFile)
-					for scanner.Scan() {
-						line := scanner.Text()
-
-						if !isMusicFileDownloaded && 0 == strings.Index(line, driveItemId) {
-							lineComponents := strings.Split(line, "##########")
-
-							playSingleMusicFile(lineComponents[1])
-
-							isMusicFileDownloaded = true
-						}
-					}
+					isMusicFileDownloaded := isDriveItemDownloaded(driveItemId)
 
 					if !isMusicFileDownloaded {
 						err = downloadDriveItem(driveItemDownloadUrl, driveItemFileName)
 
 						if err == nil {
-							dataFile.Write([]byte(fmt.Sprintf("%v##########%v\n", driveItemId, driveItemFileName)))
+							updateDownloadedDriveItemsList(driveItemId, driveItemFileName)
 							playSingleMusicFile(driveItemFileName)
 						}
 					}
