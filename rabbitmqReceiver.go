@@ -24,10 +24,7 @@ type Task struct {
 	Content []string `json:"content"`
 }
 
-var rabbitMQServerConnectionString = os.Getenv("RABBITMQ_SERVER_CONNECTION_STRING")
-var rabbitMQChannelName = os.Getenv("RABBITMQ_CHANNEL_NAME")
-
-func receiveAmqp() {
+func receiveAmqp(rabbitMQServerConnectionString string, rabbitMQChannelName string) {
 	conn, err := amqp.Dial(rabbitMQServerConnectionString)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -67,7 +64,7 @@ func receiveAmqp() {
 			for _, task := range command.Tasks {
 				if task.Name == "play-all" {
 					playAllMusicFiles()
-				} else if task.Name == "play-individual" {
+				} else if task.Name == "play-single" {
 					driveItemId := task.Content[0]
 					driveItemDownloadUrl := task.Content[1]
 					driveItemFileName := task.Content[2]
@@ -94,10 +91,11 @@ func receiveAmqp() {
 					}
 
 					if !isMusicFileDownloaded {
-						err = downloadDriveItem(driveItemDownloadUrl)
+						err = downloadDriveItem(driveItemDownloadUrl, driveItemFileName)
 
 						if err == nil {
 							dataFile.Write([]byte(fmt.Sprintf("%v##########%v\n", driveItemId, driveItemFileName)))
+							playSingleMusicFile(driveItemFileName)
 						}
 					}
 				}

@@ -9,7 +9,7 @@ import (
 	"log"
 	"net"
 	"time"
-
+	"os"
 	"github.com/joho/godotenv"
 )
 
@@ -28,7 +28,7 @@ func main() {
 	dtStart := time.Now()
 	fmt.Println("Program starts at: ", dtStart.String())
 
-	receiveAmqp()
+	receiveAmqp(os.Getenv("RABBITMQ_SERVER_CONNECTION_STRING"), os.Getenv("RABBITMQ_CHANNEL_NAME"))
 
 	dtEnd := time.Now()
 	fmt.Println("Program ends at: ", dtEnd.String())

@@ -7,10 +7,11 @@ package main
 import (
 	"os"
 	"os/exec"
+	"log"
 )
 
-func downloadDriveItem(downloadUrl string) error {
-	cmd := exec.Command("wget", downloadUrl)
+func downloadDriveItem(downloadUrl string, fileName string) error {
+	cmd := exec.Command("wget", "-O", fileName, downloadUrl)
 
 	cmd.Dir = "/home/pi/audio"
 	cmd.Stdout = os.Stdout
