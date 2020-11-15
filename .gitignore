@@ -6,8 +6,9 @@ project1
 *.so
 *.dylib
 
-# Environment variables
+# Environment variables and some data files
 *.env
+playlist.dat
 
 # Test binary, built with `go test -c`
 *.test
