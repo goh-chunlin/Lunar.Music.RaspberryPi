@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"time"
 	"os"
+	"time"
+
 	"github.com/joho/godotenv"
 )
 

@@ -7,7 +7,6 @@ package main
 import (
 	"os"
 	"os/exec"
-	"log"
 )
 
 func downloadDriveItem(downloadUrl string, fileName string) error {
