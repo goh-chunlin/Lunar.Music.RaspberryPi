@@ -58,6 +58,7 @@ func receiveAmqp(rabbitMQServerConnectionString string, rabbitMQChannelName stri
 			json.Unmarshal(d.Body, &command)
 
 			for _, task := range command.Tasks {
+
 				if task.Name == "play-all" {
 					playAllMusicFiles()
 				} else if task.Name == "play-single" {

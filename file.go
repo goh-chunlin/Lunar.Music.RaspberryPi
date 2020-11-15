@@ -27,15 +27,17 @@ func downloadDriveItem(downloadUrl string, fileName string) error {
 }
 
 func isDriveItemDownloaded(driveItemId string) bool {
-	dataFile, err := os.OpenFile("playlist.dat", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	dataFile, err := os.Open("playlist.dat")
 	if err != nil {
-		failOnError(err, "Failed to open the file playlist.dat")
+		return false
 	}
 
 	defer dataFile.Close()
 
 	isMusicFileDownloaded := false
+
 	scanner := bufio.NewScanner(dataFile)
+	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		line := scanner.Text()
 
