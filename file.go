@@ -27,26 +27,25 @@ func downloadDriveItem(downloadUrl string, fileName string) error {
 }
 
 func isDriveItemDownloaded(driveItemId string) bool {
+	isMusicFileDownloaded := false
+
 	dataFile, err := os.Open("playlist.dat")
-	if err != nil {
-		return false
-	}
 
 	defer dataFile.Close()
 
-	isMusicFileDownloaded := false
+	if err == nil {
+		scanner := bufio.NewScanner(dataFile)
+		scanner.Split(bufio.ScanLines)
+		for scanner.Scan() {
+			line := scanner.Text()
 
-	scanner := bufio.NewScanner(dataFile)
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		line := scanner.Text()
+			if !isMusicFileDownloaded && 0 == strings.Index(line, driveItemId) {
+				lineComponents := strings.Split(line, "##########")
 
-		if !isMusicFileDownloaded && 0 == strings.Index(line, driveItemId) {
-			lineComponents := strings.Split(line, "##########")
+				playSingleMusicFile(lineComponents[1])
 
-			playSingleMusicFile(lineComponents[1])
-
-			isMusicFileDownloaded = true
+				isMusicFileDownloaded = true
+			}
 		}
 	}
 
